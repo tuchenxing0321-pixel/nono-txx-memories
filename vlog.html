@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fafbfa">
+  <link rel="icon" type="image/png" href="assets/site-logo-128.png">
+  <title>VLOG · nono &amp; txx</title>
+  <link rel="stylesheet" href="assets/page-transitions.css">
+  <link rel="stylesheet" href="assets/video-collection.css">
+</head>
+<body>
+  <header class="topbar"><button class="back" type="button" onclick="location.replace('video.html')">← 返回</button><div class="brand">nono &amp; txx</div><button class="manage" id="manage" type="button" aria-pressed="false">管理</button></header>
+  <main><section class="collection-head"><div><p class="kicker">MOTION ARCHIVE / VLOG</p><h1>VLOG</h1></div><div class="head-side"><p>日常不需要很特别，只要是一起经历的。</p><span class="count" id="count">00 FILMS</span></div></section><div class="grid" id="grid"></div><p class="empty" id="empty"><span>这里还没有 VLOG<br>从 Video 页面添加第一条链接。</span></p></main>
+  <script src="assets/video-library.js"></script>
+  <script>
+    const grid=document.getElementById('grid');const empty=document.getElementById('empty');const manage=document.getElementById('manage');const count=document.getElementById('count');
+    function paint(card,item){const cover=card.querySelector('.cover');const old=cover.querySelector('img,.link-cover');if(item.cover){const image=document.createElement('img');image.src=item.cover;image.alt=`${item.name||item.autoName||'视频'} 封面`;image.referrerPolicy='no-referrer';old.replaceWith(image)}else old.textContent=VideoLibrary.isDouyin(item.url)?'＋ 封面':new URL(item.url).hostname.replace(/^www\./,'');card.querySelector('h2').textContent=item.name||item.autoName||'新增视频';card.querySelector('time').textContent=item.date}
+    function render(){grid.innerHTML='';const items=VideoLibrary.read().vlog;items.forEach(item=>{const wrapper=document.createElement('div');wrapper.className='item';wrapper.innerHTML='<button class="delete" type="button" aria-label="删除视频">×</button><a class="card" target="_blank" rel="noopener noreferrer"><div class="cover"><div class="link-cover"></div><span class="mark">↗</span></div><h2></h2><time class="date"></time></a>';const card=wrapper.querySelector('.card');card.href=item.url;paint(card,item);card.addEventListener('click',async event=>{if(!item.cover&&VideoLibrary.isDouyin(item.url)){event.preventDefault();const cover=await VideoLibrary.pickCover();if(cover){item.cover=cover;VideoLibrary.setCover('vlog',item.id,cover);paint(card,item)}}});VideoLibrary.enrich('vlog',item).then(updated=>paint(card,updated));wrapper.querySelector('.delete').addEventListener('click',()=>{if(confirm('确定从本网站删除这个 VLOG 吗？')){VideoLibrary.remove('vlog',item.id);render()}});grid.append(wrapper)});empty.hidden=items.length>0;count.textContent=`${String(items.length).padStart(2,'0')} FILMS`;manage.hidden=items.length===0;if(!items.length){grid.classList.remove('managing');manage.setAttribute('aria-pressed','false');manage.textContent='管理'}}
+    manage.addEventListener('click',()=>{const active=!grid.classList.contains('managing');grid.classList.toggle('managing',active);manage.setAttribute('aria-pressed',active);manage.textContent=active?'完成':'管理'});
+    render();
+  </script>
+</body>
+</html>

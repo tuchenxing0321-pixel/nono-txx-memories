@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>搜索 · nono & txx</title>
+  <link rel="stylesheet" href="assets/page-transitions.css">
+  <style>
+    :root{--ink:#1d1d1f;--muted:#858581;--line:#e3e0da;--paper:#f8f7f4;--accent:#8d544e}*{box-sizing:border-box}html{background:var(--paper)}body{margin:0;color:var(--ink);background:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.top{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:66px;padding:0 clamp(28px,5vw,72px);background:rgba(248,247,244,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(227,224,218,.65)}button{font:inherit}.back{justify-self:start;padding:8px 0;border:0;color:#73736f;background:none;font-size:12px;cursor:pointer}.brand{font:italic 19px Georgia,serif}.shell{width:min(900px,calc(100% - 56px));margin:auto;padding:88px 0 110px}.eyebrow{margin:0 0 13px;color:#999690;font:500 10px/1 ui-monospace,monospace;letter-spacing:.18em}.title{margin:0;font:500 clamp(48px,7vw,76px)/1.05 Georgia,"Songti SC",serif;letter-spacing:-.045em}.lead{max-width:480px;margin:22px 0 46px;color:#777570;font-size:13px;line-height:1.8}.search-box{position:relative}.search-box input{width:100%;height:64px;padding:0 54px 0 20px;border:1px solid #d9d6cf;border-radius:15px;outline:0;background:#fff;color:var(--ink);font-size:17px;box-shadow:0 8px 28px rgba(28,28,30,.035);transition:border-color .2s,box-shadow .2s}.search-box input:focus{border-color:#aaa69f;box-shadow:0 10px 32px rgba(28,28,30,.07)}.search-box svg{position:absolute;top:21px;right:20px;width:21px;height:21px;fill:none;stroke:#8b8882;stroke-width:1.5}.summary{display:flex;justify-content:space-between;margin:19px 2px 25px;color:#9a9791;font:10px/1 ui-monospace,monospace;letter-spacing:.12em}.results{border-top:1px solid var(--line)}.result{display:grid;grid-template-columns:96px 1fr auto 22px;gap:22px;align-items:center;min-height:112px;padding:23px 4px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none;transition:background .2s,transform .2s}.result:hover,.result:focus-visible{outline:0;background:#fff;transform:translateY(-1px)}.result-type{color:var(--accent);font:600 9px/1 ui-monospace,monospace;letter-spacing:.13em}.result h2{margin:0 0 8px;font:500 20px/1.2 Georgia,"Songti SC",serif}.result p{max-width:610px;margin:0;overflow:hidden;color:#777570;font-size:12px;line-height:1.6;text-overflow:ellipsis;white-space:nowrap}.result time{color:#96938d;font:10px/1 ui-monospace,monospace;letter-spacing:.08em}.arrow{color:#9c9993;font-size:19px}.empty{padding:70px 0;border-bottom:1px solid var(--line);color:#8b8882;text-align:center;font-size:13px}.empty b{display:block;margin-bottom:10px;color:#44433f;font:500 25px Georgia,"Songti SC",serif}@media(max-width:650px){.shell{width:calc(100% - 34px);padding-top:55px}.lead{margin-bottom:32px}.result{grid-template-columns:72px 1fr;gap:12px}.result time{display:none}.arrow{display:none}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="top"><button class="back" id="back">← 返回</button><div class="brand">nono &amp; txx</div><span></span></header>
+  <main class="shell">
+    <p class="eyebrow">FIND IN OUR ARCHIVE</p>
+    <h1 class="title">搜索</h1>
+    <p class="lead">在回忆、地点、日期和视频名称中，找到你们留下的内容。</p>
+    <label class="search-box"><span hidden>搜索内容</span><input id="query" type="search" placeholder="试试输入地点、年份或视频名称" autocomplete="off" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"></circle><path d="m16 16 4.2 4.2"></path></svg></label>
+    <div class="summary"><span id="status">正在读取档案</span><span>MEMORIES · DATES · VIDEO</span></div>
+    <section class="results" id="results" aria-live="polite"></section>
+  </main>
+  <script src="assets/memory-library.js"></script>
+  <script src="assets/video-library.js"></script>
+  <script>
+    const $=id=>document.getElementById(id),esc=value=>String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+    const normalize=value=>String(value||'').trim().toLocaleLowerCase('zh-CN');
+    const matches=(value,query)=>normalize(query).split(/\s+/).filter(Boolean).every(word=>normalize(value).includes(word));
+    const sortable=date=>String(date||'').replaceAll('.','-');
+    const formatDate=date=>String(date||'').replaceAll('-','.');
+    const datesKey='nono-important-dates-v1';
+    let items=[];
+    console.assert(matches('上海 2026.10.01','上海 2026')&&!matches('上海','北京'),'统一搜索匹配异常');
+
+    function savedDates(){try{const value=JSON.parse(localStorage.getItem(datesKey));return Array.isArray(value)?value:[]}catch{return []}}
+    async function load(){
+      const memories=(await MemoryLibrary.all()).filter(item=>item.kind==='event').map(item=>({type:'回忆',title:item.title||'未命名回忆',date:item.date,description:[item.place,item.story].filter(Boolean).join(' · '),search:[item.title,item.place,item.story,item.date,formatDate(item.date)].join(' '),href:`memories.html?event=${encodeURIComponent(item.id)}`}));
+      const videos=VideoLibrary.read(),videoItems=['vlog','dancee'].flatMap(category=>videos[category].map(item=>({type:'视频',title:item.autoName||item.name||'未命名视频',date:item.date,description:category==='vlog'?'VLOG':'DANCE',search:[item.autoName,item.name,item.date,category].join(' '),href:item.url||'video.html',external:Boolean(item.url)})));
+      const important=[{id:'anniversary',title:'在一起的第一天',date:'2025-09-17',note:'nono & txx'} ,...savedDates()].map(item=>({type:'日期',title:item.title||'重要日期',date:item.date,description:item.note||'',search:[item.title,item.note,item.date,formatDate(item.date)].join(' '),href:'dates.html#archive'}));
+      items=[...memories,...important,...videoItems].sort((a,b)=>sortable(b.date).localeCompare(sortable(a.date)));
+      render();
+    }
+    function render(){
+      const query=$('query').value,visible=query.trim()?items.filter(item=>matches(item.search,query)):items;
+      $('status').textContent=query.trim()?`找到 ${visible.length} 条结果`:`共 ${visible.length} 条内容`;
+      if(!visible.length){$('results').innerHTML='<div class="empty"><b>没有找到</b>换一个关键词、地点或年份试试。</div>';return}
+      $('results').innerHTML=visible.map(item=>`<a class="result" href="${esc(item.href)}"${item.external?' target="_blank" rel="noopener noreferrer"':''}><span class="result-type">${item.type}</span><div><h2>${esc(item.title)}</h2><p>${esc(item.description||'打开查看')}</p></div><time>${esc(formatDate(item.date))}</time><span class="arrow" aria-hidden="true">↗</span></a>`).join('');
+    }
+    $('query').addEventListener('input',render);
+    $('back').onclick=()=>{if(sessionStorage.getItem('nono-index-parent')==='1'){sessionStorage.removeItem('nono-index-parent');sessionStorage.setItem('nono-index-reset','1');location.href='index.html'}else if(history.length>1)history.back();else location.href='index.html'};
+    load().catch(error=>{$('status').textContent='读取失败';$('results').innerHTML=`<div class="empty"><b>暂时无法读取</b>${esc(error?.message||'请刷新后重试')}</div>`});
+  </script>
+</body>
+</html>
