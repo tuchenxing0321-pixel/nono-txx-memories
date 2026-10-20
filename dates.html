@@ -20,9 +20,10 @@
     @keyframes breathe{to{transform:scale(1.035);opacity:.72}}@media(max-width:700px){.topbar{height:64px;padding:0 20px}.brand{font-size:17px}.add-top{padding:8px 12px}main{width:min(100% - 36px,1240px)}.hero{min-height:calc(100svh - 64px)}.hero::before{width:84vw;box-shadow:0 0 0 38px rgba(164,93,99,.022),0 0 0 76px rgba(164,93,99,.013)}.countdown strong{font-size:clamp(96px,34vw,150px)}.countdown span{margin-bottom:5px}.section-head{align-items:flex-start}.section-side{flex-direction:column;align-items:flex-end}.date-grid{grid-template-columns:1fr}.date-card.is-origin{grid-column:auto}.date-card{min-height:250px;padding:25px;border-radius:22px}.date-card.is-origin{min-height:290px}.dialog-inner{padding:25px}.storage-note{padding:0 16px}.toast{right:18px;bottom:18px;left:18px;text-align:center}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
     /* Calm, neutral hierarchy with the existing rose reserved for state. */
-    :root{--paper:#fafafa;--card:#fff;--ink:#1d1d1f;--muted:#76767b;--line:rgba(29,29,31,.1);--accent:#a45d63;--accent-soft:#f3e8e9}
+    :root{--paper:var(--ui-bg);--card:var(--ui-surface);--ink:var(--ui-ink);--muted:var(--ui-muted);--line:var(--ui-line);--accent:var(--ui-accent);--accent-soft:#f3e8e9}
     body{background:var(--paper)}
-    .topbar{border-bottom:1px solid var(--line);background:rgba(250,250,250,.96);box-shadow:none;backdrop-filter:none}
+    .topbar{height:var(--ui-header-height);padding:0 var(--ui-page-gutter);border-bottom:1px solid var(--line);background:rgba(250,250,250,.96);box-shadow:none;backdrop-filter:none}
+    .brand{font:600 17px/1 var(--ui-font-display);letter-spacing:-.025em}
     .back:hover{transform:translateX(-2px)}
     .add-top{transition:background .18s,transform .18s}
     .add-top:hover{transform:translateY(-1px)}
@@ -46,8 +47,13 @@
     .date-card.is-origin::after{display:none}
     .is-origin .status{color:#f6e7e9;background:rgba(164,93,99,.28)}
     .card-main h3{font-size:clamp(28px,3vw,42px)}
-    dialog{border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 64px rgba(20,20,22,.16)}
+    dialog{border:1px solid var(--line);border-radius:var(--ui-radius-lg);background:var(--ui-surface);box-shadow:var(--ui-shadow-dialog)}
     dialog::backdrop{background:rgba(25,25,28,.28);backdrop-filter:none}
+    .dialog-head h2{font:500 30px/1.1 var(--ui-font-display);letter-spacing:-.035em}.dialog-head p{color:var(--muted)}
+    .close{width:34px;height:34px;border-radius:9px;background:var(--ui-surface-soft)}
+    .field{color:var(--muted)}.field input,.field textarea{border-color:var(--line)}
+    .cancel{color:var(--ink);background:var(--ui-surface-soft)}
+    .toast{background:var(--ui-ink);box-shadow:var(--ui-shadow-card)}.toast.error{background:var(--ui-danger)}
     @media(max-width:700px){main{width:min(100% - 36px,1240px)}.hero{min-height:clamp(470px,72svh,560px)}.countdown strong{font-size:clamp(88px,30vw,138px)}.date-card,.date-card.is-origin{min-height:240px;padding:25px;border-radius:18px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
