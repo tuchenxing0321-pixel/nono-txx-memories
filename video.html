@@ -96,9 +96,10 @@
     @media(max-width:340px){.video-grid{grid-template-columns:1fr}}
 
     /* Restrained product treatment: content first, one accent, no ornamental loops. */
-    :root{--paper:#fafafa;--card:#fff;--ink:#1d1d1f;--muted:#76767b;--line:rgba(29,29,31,.1);--accent:#a45d63}
+    :root{--paper:var(--ui-bg);--card:var(--ui-surface);--ink:var(--ui-ink);--muted:var(--ui-muted);--line:var(--ui-line);--accent:var(--ui-accent)}
     body{background:var(--paper)}
-    .topbar{border-bottom:1px solid var(--line);background:rgba(250,250,250,.96);box-shadow:none;backdrop-filter:none}
+    .topbar{height:var(--ui-header-height);padding:0 var(--ui-page-gutter);border-bottom:1px solid var(--line);background:rgba(250,250,250,.96);box-shadow:none;backdrop-filter:none}
+    .brand{font:600 17px/1 var(--ui-font-display);letter-spacing:-.025em}
     .back:hover{transform:translateX(-2px)}
     main{width:min(1280px,calc(100% - 96px));padding:clamp(50px,6vw,82px) 0 112px}
     .hero{min-height:430px;padding:70px 6px 62px;border:0;border-radius:0;background:transparent;box-shadow:none}
@@ -121,8 +122,14 @@
     .add-card::after{display:none}
     .add-card:hover{color:var(--accent);border-color:rgba(164,93,99,.55);background:var(--card);box-shadow:none;transform:translateY(-2px)}
     .video-card,.add-card{animation-duration:.42s}
-    .dialog{border:1px solid var(--line);border-radius:20px;box-shadow:0 22px 60px rgba(20,20,22,.14)}
+    .dialog{width:min(520px,calc(100% - 32px));border:1px solid var(--line);border-radius:var(--ui-radius-lg);background:var(--ui-surface);box-shadow:var(--ui-shadow-dialog)}
     .dialog::backdrop{background:rgba(25,25,28,.28);backdrop-filter:none}
+    .dialog-form{padding:30px}.dialog-form h3{font:500 30px/1.1 var(--ui-font-display);letter-spacing:-.035em}.dialog-form p{margin:8px 0 24px;color:var(--muted);letter-spacing:.04em}
+    .field{color:var(--muted);letter-spacing:0}.field input{padding:12px 1px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}.field input:focus{border-color:var(--accent)}
+    .field input[type="file"]{padding:10px 0}
+    .field input[type="file"]::file-selector-button{margin-right:12px;padding:8px 13px;color:#fff;border:0;border-radius:var(--ui-radius-pill);background:var(--ink);font:600 11px/1 inherit;cursor:pointer}
+    .dialog-actions button{padding:10px 17px;color:var(--ink);border:0;border-radius:var(--ui-radius-pill);background:var(--ui-surface-soft)}
+    .dialog-actions .save{border:0;color:#fff;background:var(--ink)}
     .random-section{min-height:210px;margin-top:112px;padding:46px 6px}
     .random-section::before{display:none}
     .random-meta strong{font-size:clamp(36px,5vw,60px)}
@@ -131,6 +138,11 @@
     .random-play span:last-child{transition:transform .2s}
     .random-play:hover span:last-child{transform:translateX(2px)}
     .reveal-section{transform:translateY(10px);transition:opacity .46s ease,transform .46s cubic-bezier(.2,.75,.2,1)}
+    /* Let each film read as image first, then metadata—not an overlay template. */
+    .card-info{position:static;display:block;padding:11px 1px 0;color:var(--ink);background:none;pointer-events:none}
+    .card-title{color:var(--ink);font-size:14px;font-weight:590;text-shadow:none}
+    .card-date{margin-top:4px;color:var(--muted);font-size:9px;letter-spacing:.08em}
+    .video-card:hover .card-title{color:var(--accent)}
     @media(max-width:1100px){.video-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media(max-width:680px){main{width:min(100% - 32px,1120px);padding-top:30px}.hero{min-height:360px;padding:46px 4px}.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}.random-section{margin-top:82px;padding:34px 4px}}
     @media(max-width:340px){.video-grid{grid-template-columns:1fr}}
@@ -213,7 +225,7 @@
       card.href=item.url;
       card.target='_blank';
       card.rel='noopener noreferrer';
-      card.innerHTML=`<div class="cover"><div class="link-cover"></div><div class="card-info"><h3 class="card-title"></h3><time class="card-date"></time></div><span class="open-mark" aria-hidden="true">↗</span></div>`;
+      card.innerHTML=`<div class="cover"><div class="link-cover"></div><span class="open-mark" aria-hidden="true">↗</span></div><div class="card-info"><h3 class="card-title"></h3><time class="card-date"></time></div>`;
       paintCard(card,item);
       card.addEventListener('click',async event=>{if(!item.cover&&VideoLibrary.isDouyin(item.url)){event.preventDefault();const cover=await VideoLibrary.pickCover();if(cover){item.cover=cover;VideoLibrary.setCover(category,item.id,cover);paintCard(card,item)}}});
       VideoLibrary.enrich(category,item).then(updated=>paintCard(card,updated));
